@@ -6,9 +6,32 @@ from math import floor
 from tqdm import tqdm_notebook as tqdm
 import pandas as pd
 
-plt.rcParams['font.size'] = 14
-
-def represent_distribution(sample, xmin=None, xmax=None, nx=None, kind='01', norm_hist=True, figsize=(20,8), title=''):
+def get_songs_albums_artists(df):
+    n_songs = df.shape[0]
+    n_albums = df.release_id.nunique()
+    n_artists = df.artist_id.nunique()
+    return n_songs, n_albums, n_artists
+##########################################################################################################################
+# Templates
+##########################################################################################################################
+def template_vis():
+    plt.gca().set_facecolor("#101010")
+    plt.gca().spines['right'].set_visible(False)
+    plt.gca().spines['left'].set_visible(False)
+    plt.gca().spines['top'].set_visible(False)
+    plt.gca().spines['bottom'].set_visible(False)
+    plt.gca().xaxis.set_ticks_position('none') 
+    plt.gca().yaxis.set_ticks_position('none') 
+    
+def plt_captions(title='', xlabel='', ylabel='', titlesize=22, labelsize=18):
+    plt.title(title.upper(), fontsize=titlesize, pad=10, color='white', alpha=0.8)
+    plt.xlabel(xlabel, fontsize=labelsize, color='white', alpha=0.8)
+    plt.ylabel(ylabel, fontsize=labelsize, color='white', alpha=0.8)
+##########################################################################################################################
+# Vis
+##########################################################################################################################
+def represent_distribution(sample, xmin=None, xmax=None, nx=None,
+                           kind='01', norm_hist=True, figsize=(20,8), title=''):
     mpl.rcParams['figure.figsize'] = figsize
     if kind == '0':
         f, ax_box = plt.subplots(1)
@@ -51,7 +74,7 @@ def p_quantile(x, p):
         return (x[m-1] + x[m]) / 2
     else:
         return x[int(floor(m))]
-    
+
 ##########################################################################################################################
 # Text processing
 ##########################################################################################################################
@@ -94,6 +117,11 @@ def remove_stopwords(tokens_list, languages=None):
 ##########################################################################################################################
 def frequency(df=None, by=None, aux=None, series=None, min_freq_to_show=2, figsize=(20,6)):
     mpl.rcParams['figure.figsize'] = figsize
+#     plt.gca().grid(which='major', alpha=0.25, linestyle='--')
+#     plt.gca().spines['right'].set_visible(False)
+#     plt.gca().spines['left'].set_visible(False)
+#     plt.gca().spines['top'].set_visible(False)
+    c = np.random.choice(['#554DD2', '#C21D90', '#4ABDC2']) 
     if aux is None:
         if series is None:
             series = df[by]
@@ -101,14 +129,7 @@ def frequency(df=None, by=None, aux=None, series=None, min_freq_to_show=2, figsi
     else:
         frequencies = df.groupby(df[by])[aux].nunique().sort_values(ascending=False)
     temp = frequencies[frequencies > min_freq_to_show]
-    plt.bar(temp.index, temp.values)
-
-
-def plt_captions(title, xlabel='', ylabel='', titlesize=22, labelsize=18):
-    plt.title(title.upper(), fontsize=titlesize, pad=10)
-    plt.xlabel(xlabel, fontsize=labelsize)
-    plt.ylabel(ylabel, fontsize=labelsize)
-    
+    plt.bar(temp.index, temp.values, color=c, linewidth=0, alpha=0.7)
     
     
 ##########################################################################################################################
@@ -118,50 +139,44 @@ def shorten_tag(tag):
     return ''.join(tag.split()[:1])
 
 tags_mapping = [
- 'rap',
  'blues',
  'classic',
  'country',
  'folk',
- 'finnish',
- 'pop',
  'progressive',
  'reggae',
  'funk',
  'soundtrack',
  'electronic',
- 'trance',
- 'trip',
+ 'jungle',
  'composer',
  'gospel',
- 'world',
- 'french',
  'black',
- 'brazilian',
- 'canadian',
- 'colombian',
- 'german',
- 'greek',
- 'house',
- 'norwegian',
- 'southern',
- 'spanish',
- 'swedish',
- 'barbadian',
- 'birmingham',
- 'irish',
- 'italian',
- 'jungle',
- 'latin',
- 'latvian',
- 'lebanese',
- 'malian',
- 'northern',
- 'czech',
- 'deutschland',
- 'scottish',
- 'taiwanese',
- 'toronto',
+#  'world',
+#  'french',
+#  'brazilian',
+#  'canadian',
+#  'colombian',
+#  'german',
+#  'greek',
+#  'norwegian',
+#  'southern',
+#  'spanish',
+#  'swedish',
+#  'barbadian',
+#  'birmingham',
+#  'irish',
+#  'italian',
+#  'latin',
+#  'latvian',
+#  'lebanese',
+#  'malian',
+#  'northern',
+#  'czech',
+#  'deutschland',
+#  'scottish',
+#  'taiwanese',
+#  'toronto',
 ]
 tags_mapping = dict(zip(tags_mapping, [[t] for t in tags_mapping]))
 tags_mapping.update({
@@ -178,7 +193,11 @@ tags_mapping.update({
 'contemporary': ['contemporary', 'new'],
 'other': ['whistle', 'steal','skate', 'ndw','ska', 'hong', 'production', 'desi', 'easy', 'franASSais','performance', 'operatic', 'suA(c)dois', 'a', 'dA1/4sseldorf', 'seen'],
 'indie': ['indie', 'shoegaze'],
-'r\'n\'b': ['r\'n\'b','rnb']})
+'r\'n\'b': ['r\'n\'b','rnb', 'rap'],
+'pop': ['pop', 'house'],
+'world': ['world', 'french', 'brazilian', 'canadian', 'colombian', 'german', 'greek', 'norwegian', 'southern', 'spanish', 'swedish', 'barbadian', 'birmingham', 'irish', 'italian', 'latin', 'latvian', 'lebanese', 'malian', 'northern', 'czech', 'deutschland', 'scottish', 'taiwanese', 'toronto', 'finnish'],
+'trance': ['trip', 'trance'],
+})
 tags_inverse_mapping = {}
 for key in tags_mapping:
     for value in tags_mapping[key]:

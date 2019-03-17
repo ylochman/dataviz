@@ -30,27 +30,84 @@ def plt_captions(title='', xlabel='', ylabel='', titlesize=22, labelsize=18):
 ##########################################################################################################################
 # Vis
 ##########################################################################################################################
-def represent_distribution(sample, xmin=None, xmax=None, nx=None,
-                           kind='01', norm_hist=True, figsize=(20,8), title=''):
+three_colors = ['#554DD2', '#C21D90', '#4ABDC2']
+
+def frequency(df=None, by=None, aux=None, series=None, min_freq_to_show=2, figsize=(20,6)):
+    mpl.rcParams['figure.figsize'] = figsize
+    c = np.random.choice(three_colors) 
+    if aux is None:
+        if series is None:
+            series = df[by]
+        frequencies = series.groupby(series).count().sort_values(ascending=False)
+    else:
+        frequencies = df.groupby(df[by])[aux].nunique().sort_values(ascending=False)
+    temp = frequencies[frequencies > min_freq_to_show]
+    plt.bar(temp.index, temp.values, color=c, linewidth=0, alpha=0.7)
+
+
+def plot_histogram(sample, ax=None, xmin=None, xmax=None, nx=None, norm_hist=True, figsize=(20,8), title='', titlesize=20):
+    mpl.rcParams['figure.figsize'] = figsize
+    c = np.random.choice(three_colors) 
+    if ax is None:
+        sns.distplot(sample, bins='sqrt', norm_hist=norm_hist, color=c)
+        if nx is not None:
+            plt.xaxis.set_major_locator(plt.MaxNLocator(nx))
+        if xmin is not None:
+            plt.set_xlim(left=xmin)
+        if xmax is not None:
+            plt.set_xlim(right=xmax)
+    else:
+        sns.distplot(sample, ax=ax, bins='sqrt', norm_hist=norm_hist, color=c)
+        if nx is not None:
+            ax.xaxis.set_major_locator(plt.MaxNLocator(nx))
+        if xmin is not None:
+            ax.set_xlim(left=xmin)
+        if xmax is not None:
+            ax.set_xlim(right=xmax)
+        ax.set_title(title, alpha=0.8, fontsize=titlesize, pad=10)
+        ax.spines['right'].set_visible(False)
+        ax.spines['left'].set_visible(False)
+        ax.spines['top'].set_visible(False)
+        ax.spines['bottom'].set_visible(False)
+        
+        ax.set_facecolor("#101010")
+
+
+def represent_distribution(sample, xmin=None, xmax=None, nx=None, stripplot=False,
+                           kind='01', norm_hist=True, figsize=(20,8), title='', titlesize=20):
     mpl.rcParams['figure.figsize'] = figsize
     if kind == '0':
         f, ax_box = plt.subplots(1)
-        sns.boxplot(sample, fliersize=0, whis=1.5, ax=ax_box)
-        sns.stripplot(sample, color="orange", jitter=0.2, size=3, ax=ax_box)
+        sns.boxplot(sample, fliersize=0, whis=1.5, ax=ax_box, color=three_colors[2])
+        if stripplot:
+            sns.stripplot(sample, color="orange", jitter=0.2, size=3, ax=ax_box)
+        ax_box.set_facecolor("#101010")
+        ax_box.grid(False)
         ax_box.set(xlabel='')        
-        ax_box.set_title(title)
+        ax_box.set_title(title, alpha=0.8, fontsize=titlesize, pad=10)
+        ax_box.spines['right'].set_visible(False)
+        ax_box.spines['left'].set_visible(False)
+        ax_box.spines['top'].set_visible(False)
+        ax_box.spines['bottom'].set_visible(False)
     else:
         if kind == '01':
             f, (ax_box, ax_hist) = plt.subplots(2, sharex=True,
-                                                gridspec_kw={"height_ratios": (.25, .75)})
-            sns.boxplot(sample, fliersize=0, whis=1.5, ax=ax_box)
-            sns.stripplot(sample, color="orange", jitter=0.2, size=3, ax=ax_box)
+                                                gridspec_kw={"height_ratios": (.15, .85)})
+            sns.boxplot(sample, fliersize=0, whis=1.5, ax=ax_box, color=three_colors[1])
+            if stripplot:
+                sns.stripplot(sample, color="orange", jitter=0.2, size=3, ax=ax_box)
+            ax_box.set_facecolor("#101010")
+            ax_box.grid(False)
             ax_box.set(xlabel='')
-            ax_box.set_title(title)
+            ax_box.set_title(title, alpha=0.8, fontsize=titlesize, pad=10)
+            ax_box.spines['right'].set_visible(False)
+            ax_box.spines['left'].set_visible(False)
+            ax_box.spines['top'].set_visible(False)
+            ax_box.spines['bottom'].set_visible(False)
         else:
             f, ax_hist = plt.subplots(1)
-            ax_hist.set_title(title)
-        sns.distplot(sample, ax=ax_hist, bins='sqrt', norm_hist=norm_hist)
+            ax_hist.set_title(title, alpha=0.8, fontsize=titlesize, pad=10)
+        sns.distplot(sample, ax=ax_hist, bins='sqrt', norm_hist=norm_hist, color=three_colors[2])
         if nx is not None:
             ax_hist.xaxis.set_major_locator(plt.MaxNLocator(nx))
         if xmin is not None:
@@ -113,23 +170,6 @@ from nltk.corpus import stopwords
 def remove_stopwords(tokens_list, languages=None):
     return [token for token in tqdm(tokens_list)
                 if not token.lower() in stopwords.words(languages)]
-
-##########################################################################################################################
-def frequency(df=None, by=None, aux=None, series=None, min_freq_to_show=2, figsize=(20,6)):
-    mpl.rcParams['figure.figsize'] = figsize
-#     plt.gca().grid(which='major', alpha=0.25, linestyle='--')
-#     plt.gca().spines['right'].set_visible(False)
-#     plt.gca().spines['left'].set_visible(False)
-#     plt.gca().spines['top'].set_visible(False)
-    c = np.random.choice(['#554DD2', '#C21D90', '#4ABDC2']) 
-    if aux is None:
-        if series is None:
-            series = df[by]
-        frequencies = series.groupby(series).count().sort_values(ascending=False)
-    else:
-        frequencies = df.groupby(df[by])[aux].nunique().sort_values(ascending=False)
-    temp = frequencies[frequencies > min_freq_to_show]
-    plt.bar(temp.index, temp.values, color=c, linewidth=0, alpha=0.7)
     
     
 ##########################################################################################################################

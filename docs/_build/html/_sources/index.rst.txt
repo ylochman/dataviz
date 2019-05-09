@@ -1,4 +1,4 @@
-Simple documentation
+Documentation
 ====================
 
 Contents
@@ -16,9 +16,9 @@ Contents
    bibliography
 
 
-Indices and tables
-==================
-
-* :ref:`genindex`
-* :ref:`modindex`
-* :ref:`search`
+.. Indices and tables
+.. ==================
+.. 
+.. * :ref:`genindex`
+.. * :ref:`modindex`
+.. * :ref:`search`

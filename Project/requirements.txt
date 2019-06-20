@@ -1,0 +1,7 @@
+dash==0.43.0
+dash-daq==0.1.0
+plotly==3.6.1
+numpy==1.16.4
+pandas==0.24.2
+pycountry==18.12.8
+gunicorn==19.9.0

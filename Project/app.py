@@ -11,6 +11,11 @@ from data_utils import get_data
 from app_utils import get_choropleth, get_histogram, get_general_plot
 from app_utils import mapbox_access_token, scl1, scl2
 
+# Dash App
+external_stylesheets = ['https://codepen.io/chriddyp/pen/bWLwgP.css']
+app = dash.Dash(__name__, external_stylesheets=external_stylesheets,
+                meta_tags=[{"content": "width=device-width"}])
+server = app.server
 
 # Data
 dfs, dfs_continents, codes, names = get_data()
@@ -111,7 +116,7 @@ first_block = html.Div(
         subblock,
         dcc.Interval(
             id='interval',
-            interval=500, # in milliseconds
+            interval=800, # in milliseconds
             n_intervals=0),
         html.Br(),
         html.Br(),
@@ -128,10 +133,7 @@ second_block = html.Div(
         histogram
     ],
 )
-# Dash App
-external_stylesheets = ['https://codepen.io/chriddyp/pen/bWLwgP.css']
-app = dash.Dash(__name__, external_stylesheets=external_stylesheets,
-                meta_tags=[{"content": "width=device-width"}])
+
 app.layout = html.Div(className="row", children=[first_block, second_block])
 
 # Main Callback
@@ -216,39 +218,5 @@ def update_button(n, value, year, buttontitle):
                 year -= 1
         return 'Pause', year, buttontitle
 
-# app.layout = html.Div([
-#     html.Div([
-
-#         html.Div([
-#             dcc.Dropdown(
-#                 id='xaxis-column',
-#                 options=[{'label': i, 'value': i} for i in available_indicators],
-#                 value='Fertility rate, total (births per woman)'
-#             ),
-#             dcc.RadioItems(
-#                 id='xaxis-type',
-#                 options=[{'label': i, 'value': i} for i in ['Linear', 'Log']],
-#                 value='Linear',
-#                 labelStyle={'display': 'inline-block'}
-#             )
-#         ],
-#         style={'width': '48%', 'display': 'inline-block'}),
-
-#         html.Div([
-#             dcc.Dropdown(
-#                 id='yaxis-column',
-#                 options=[{'label': i, 'value': i} for i in available_indicators],
-#                 value='Life expectancy at birth, total (years)'
-#             ),
-#             dcc.RadioItems(
-#                 id='yaxis-type',
-#                 options=[{'label': i, 'value': i} for i in ['Linear', 'Log']],
-#                 value='Linear',
-#                 labelStyle={'display': 'inline-block'}
-#             )
-#         ],style={'width': '48%', 'float': 'right', 'display': 'inline-block'})
-#     ]),
-
-
 if __name__ == '__main__':
-    app.run_server(host='0.0.0.0', debug=True, port=8050)
+    app.run_server(debug=True)

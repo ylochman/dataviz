@@ -10,3 +10,4 @@
 <img src="/Assignment-3/vis_time.png" width="54%"><img src="/Assignment-3/vis_melody.png" width="46%">
 <img src="/Assignment-3/vis_loudness.png" width="100%">
 <img src="/Assignment-3/vis_loudness.gif" width="100%">
+<img src="/Project/vis.png" width="100%">
